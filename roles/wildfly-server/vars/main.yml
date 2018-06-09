@@ -1,0 +1,5 @@
+wildfly_home: '/home/wildfly'
+wildfly_opt: '/opt/wildfly'
+opt: '/opt'
+wildfly_etc: '/etc/wildfly'
+

@@ -1,0 +1,61 @@
+- name: installation de Git
+  package: name=git state=present
+
+- name: installation du jdk8
+  package: name=openjdk-8-jdk-headless state=present
+
+- name: creation du compte pour wildfly
+  user:
+    name: wildfly
+    shell: /bin/false
+    system: yes
+    home: '{{wildfly_home}}'  
+
+- name: telecharge et desarchive
+  unarchive:
+    src: http://download.jboss.org/wildfly/11.0.0.Final/wildfly-11.0.0.Final.tar.gz
+    dest: '{{opt}}'
+    remote_src: yes
+    owner: wildfly
+
+- name: creation des repertoires pour etc
+  file:
+    path: '{{wildfly_etc}}'
+    state: directory
+    owner: wildfly
+
+- name: creation du lien symbolique
+  file:
+    src: /opt/wildfly-11.0.0.Final
+    dest: /opt/wildfly
+    owner: wildfly
+    state: link
+
+- name: copie fichier config
+  copy: 
+    src: /opt/wildfly/docs/contrib/scripts/systemd/wildfly.conf
+    dest: /etc/wildfly
+    owner: wildfly
+    remote_src: yes
+
+- name: copie fichier service
+  copy: 
+    src: /opt/wildfly/docs/contrib/scripts/systemd/wildfly.service
+    dest: /etc/systemd/system
+    owner: wildfly
+    remote_src: yes
+
+- name: copie fichier launch
+  copy: 
+    src: /opt/wildfly/docs/contrib/scripts/systemd/launch.sh
+    dest: /opt/wildfly/bin
+    owner: wildfly
+    remote_src: yes
+    mode: 0755
+
+- name: demarrage du service
+  systemd: 
+    state: restarted
+    daemon_reload: yes
+    name: wildfly
+
